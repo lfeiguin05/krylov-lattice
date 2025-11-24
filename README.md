@@ -95,9 +95,47 @@ b_n^{\beta\alpha} & b_n^{\beta\beta}
 \end{pmatrix}^{-1}
 ```
 
-## Code to Math Translation
+## Code to Math Translation 
 
-### Variables
+### Hamiltonian generation
+The hamiltonian is generated and mapped to a 2D coordinate system such that one is able to retrieve the coordinates and input coordinates for a seed to get the states for N iterations.
+For example, N = 1 means that the Hamiltonian has ones (amplitudes) corresponding to the sites that are direct "neighbors" to the seed. N = 2 finds the neighbors of the seeds neighbors, 
+and so on. The amplitudes of the coordinates are then assigned within a dictionary. The neighbors are: 
+
+```python
+neighbors = [(x+1, y), (x, y+1), (x-1, y), (x, y-1)]
+```
+
+This generates a coordinate-to-index mapping:
+```python
+coord_to_index = {(0,0): 0, (1,0): 1, (0,1): 2, (-1,0): 3, ...}
+```
+
+The maximum number of sites is:
+```math
+n = 1 + 2N(N+1)
+```
+The `apply_H()` function implements the hamiltonian for the "neighbor" hopping:
+```math
+H|\psi\rangle = \sum_{\langle i,j \rangle} (|i\rangle\langle j| + |j\rangle\langle i|)
+```
+
+For each site, the amplitude spreads to its four nearest neighbors:
+```python
+Av[neighbor_idx] += amplitude[site_idx]
+```
+
+The standard Lanczos algorithm computes the tridiagonal matrix representation for one seed (block lanczos for multiple seeds which is described further below):
+
+```math
+\alpha_n = \frac{\langle v_n | H | v_n \rangle}{\langle v_n | v_n \rangle}
+```
+```math
+\beta_n = ||H|v_n\rangle - \alpha_n |v_n\rangle - \beta_{n-1} |v_{n-1}\rangle||
+```
+
+
+### Variables for block laczos: 
 - `Q` = Current block of vectors: $[|\alpha_n\rangle, |\beta_n\rangle]$ (as columns)
 - `Q_prev` = Previous block: $[|\alpha_{n-1}\rangle, |\beta_{n-1}\rangle]$
 - `HQ` = Hamiltonian applied to current block: $[H|\alpha_n\rangle, H|\beta_n\rangle]$
@@ -199,12 +237,7 @@ Rearranging:
 Q_{n+1} B_{n+1} = H Q_n - Q_{n-1} B_n^T - Q_n A_n
 ```
 
-### Key Properties
-
-- **A matrices are symmetric**: $A_n = Q_n^T H Q_n$ (diagonal blocks in the tridiagonal structure)
-- **B matrices are upper triangular**: From QR factorization (off-diagonal blocks)
-- **Q blocks are orthonormal**: $Q_i^T Q_j = \delta_{ij} I$ (maintained by QR)
-- **Builds block tridiagonal matrix**:
+And finally 
 ```math
 T = \begin{pmatrix}
 A_1 & B_2^T & 0 & 0 & \cdots \\
