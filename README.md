@@ -218,12 +218,6 @@ where:
 - `Q_next` = $Q_{n+1}$ is the orthonormal next block
 - `R_next` = $B_{n+1}$ is the upper triangular B matrix for the next iteration
 
-**7. Convergence check:**
-```python
-if Q_next.shape[1] == 0:
-    break
-```
-Stops when the Krylov subspace is exhausted (invariant subspace found).
 
 ### Full Recursion
 
