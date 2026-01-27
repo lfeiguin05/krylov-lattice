@@ -687,7 +687,7 @@ def plot_T_structure(T: np.ndarray, block_sizes: List[int]):
 
 
 
-# ============ Example Usage ============
+
 
 if __name__ == "__main__":
     print("=" * 60)
