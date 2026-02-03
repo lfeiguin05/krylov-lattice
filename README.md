@@ -241,5 +241,5 @@ B_2 & A_2 & B_3^T & 0 & \cdots \\
 \end{pmatrix}
 ```
 
-The eigenvalues of $T$ approximate the eigenvalues of $H$.
+The matrix $T$ is equivalent to the matrix $H$ because they are related by a unitary transformation.
 
